@@ -1,19 +1,34 @@
-class SingUpController{
-    handle(httpRequest:any):any{
+import { BadRequest, ServerError } from '../Helpers/HttpHelpers'
+import { MissingParamsErro,InvalidParamsErro } from '../Erros'
+import { Controller,EmailValidator,HttpRequest,HttpResponse } from '../protocols'
 
-        if(!httpRequest.body.name){
-            return{
-                statusCode: 400,
-                body: new Error('Missing param: name')
+class SingUpController implements Controller{
+
+    private readonly emailValidator :EmailValidator
+
+    constructor(emailValidator :EmailValidator){
+        this.emailValidator = emailValidator
+    } 
+
+    handle(httpRequest:HttpRequest):HttpResponse | undefined{
+
+        try {
+            const requiredFields = ['name','email', 'password', 'passwordConfirmation']
+    
+            for (const field of requiredFields){
+                if(!httpRequest.body[field]){
+                    return BadRequest( new MissingParamsErro(field))
+                }
             }
+    
+            const isValid = this.emailValidator.isValid(httpRequest.body.email)
+            if(!isValid){
+                return BadRequest( new InvalidParamsErro('email'))
+            }
+        } catch (error) {
+            return ServerError()
         }
 
-        if(!httpRequest.body.email){
-            return{
-                statusCode: 400,
-                body: new Error('Missing param: email')
-            }
-        }
 
     }
 }
