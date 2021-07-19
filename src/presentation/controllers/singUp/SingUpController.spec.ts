@@ -1,8 +1,8 @@
 import {SingUpController} from './SingUpController'
-import { EmailValidator } from '../protocols'
-import { ServerErro,InvalidParamsErro,MissingParamsErro } from '../Erros'
-import { AddAccount, AddAccountModel } from '../../domain/useCase/addAccount'
-import { AccountModel } from '../../domain/models/AccountModel'
+import { EmailValidator } from './SingUp-Protocols'
+import { ServerErro,InvalidParamsErro,MissingParamsErro } from '../../Erros'
+import { AddAccount, AddAccountModel } from '../../../domain/useCase/addAccount'
+import { AccountModel } from '../../../domain/models/AccountModel'
 
 interface SutTypes {
     sut: SingUpController
