@@ -19,11 +19,11 @@ const makeSut = (): SutTypes => {
     }
 
     class AddAccountStub implements AddAccount{
-        add(account: AddAccountModel): AccountModel{
+        async add(account: AddAccountModel): Promise<AccountModel>{
             const fakeAccount = {
                 id: 'valid_id',
                 name: 'valid_name',
-                email: 'valid_email@email.com',
+                email: 'valid_email@gmail.com',
                 password: 'valid_password'
             }
 
@@ -190,6 +190,49 @@ describe('SingUpController', () => {
             name: "any_name",
             email: "invalid_name@gmail.com",
             password: "any_password",
+       })
+    })
+    test('Should return 500 if AddAccount throws', () =>{
+       
+        const {sut,addAccountStub} = makeSut()
+        
+        jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() =>{
+            throw new Error()
+        })
+        
+        const httpRequest = {
+            body: {
+                name: "any_name",
+                email: "invalid_name@gmail.com",
+                password: "any_password",
+                passwordConfirmation: "any_password"
+            }
+        }
+       const httpResponse =  sut.handle(httpRequest)
+       expect(httpResponse?.statusCode).toBe(500)
+       expect(httpResponse?.body).toEqual(new ServerErro())
+    })
+    test('Should return 200 if valid data is provided', () =>{
+       
+        const {sut,addAccountStub} = makeSut()
+        
+        jest.spyOn(addAccountStub, 'add')
+        
+        const httpRequest = {
+            body: {
+                name: "valid_name",
+                email: "valid_email@gmail.com",
+                password: "valid_password",
+                passwordConfirmation: "valid_password"
+            }
+        }
+       const httpResponse =  sut.handle(httpRequest)
+       expect(httpResponse?.statusCode).toBe(200)
+       expect(httpResponse?.body).toEqual({
+            id: 'valid_id',
+            name: "valid_name",
+            email: "valid_email@gmail.com",
+            password: "valid_password",
        })
     })
 })
