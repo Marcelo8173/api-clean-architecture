@@ -12,7 +12,7 @@ class DbAddAccount implements AddAccount {
 
     async add(account: AddAccountModel): Promise<AccountModel | null>{
         await this.encrypter.encrypt(account.password)
-        return new Promise(resolve => resolve(null))
+        return new Promise(resolve => resolve(null)) 
     }
 
 }
