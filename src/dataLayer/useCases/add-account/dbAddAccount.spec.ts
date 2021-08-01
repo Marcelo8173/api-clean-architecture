@@ -1,9 +1,27 @@
-import { Encrypter } from '../../protocols/encrypter'
+import { Encrypter, AddAccountModel,AccountModel,AddAccountRepository } from './dbAddAccountProtocols'
 import {DbAddAccount} from './dbAddAccount'
 
 interface sutTypes{
     sut: DbAddAccount,
-    encrypterStub: Encrypter
+    encrypterStub: Encrypter,
+    addAccountRepositoryStub: AddAccountRepository
+}
+
+const makeAddAccountRepository = (): AddAccountRepository => {
+    class AddAccountRespositoryStub implements AddAccountRepository{
+        async add(accountData: AddAccountModel): Promise<AccountModel | null>{
+            const fakeAccount = {
+                id:'valid_ad',
+                name:'valid name',
+                email: 'valideEmail@mail.com',
+                password:'hash_password'
+            }
+
+            return new Promise(resolve => resolve(fakeAccount))
+        }
+    }
+
+    return new AddAccountRespositoryStub()
 }
 
 const makeSut = ():sutTypes => {
@@ -14,11 +32,13 @@ const makeSut = ():sutTypes => {
     }
     
     const encrypterStub = new EncrypterStub()
-    const sut = new DbAddAccount(encrypterStub)
+    const addAccountRepositoryStub = makeAddAccountRepository() 
+    const sut = new DbAddAccount(encrypterStub,addAccountRepositoryStub)
 
     return {
         sut,
-        encrypterStub
+        encrypterStub,
+        addAccountRepositoryStub
     }
 }
 
@@ -49,5 +69,23 @@ describe('dbAddAccount usecase',() => {
         const promise = sut.add(accountDate)
 
         await expect(promise).rejects.toThrow()
+    })
+    test('Should call add account repository with correct values', async () => {
+        const {sut, addAccountRepositoryStub} = makeSut()
+        const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
+        
+        const accountDate = {
+            name:'valid name',
+            email: 'valideEmail@mail.com',
+            password:'validPassword'
+        }
+
+        await sut.add(accountDate)
+
+        expect(addSpy).toHaveBeenCalledWith({
+            name:'valid name',
+            email: 'valideEmail@mail.com',
+            password:'hash_password'
+        })
     })
 })
