@@ -10,9 +10,12 @@ class DbAddAccount implements AddAccount {
         this.addAccountRespository = addAccountRespository
     }
 
-    async add(account: AddAccountModel): Promise<AccountModel | null>{
-        await this.encrypter.encrypt(account.password)
-        return new Promise(resolve => resolve(null)) 
+    async add(accountData: AddAccountModel): Promise<AccountModel | null>{
+        const hashPassword = await this.encrypter.encrypt(accountData.password)
+        const account = await this.addAccountRespository.add(Object.assign({},accountData,{
+            password: hashPassword
+        }))
+        return account
     }
 
 }
