@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests --silent --noStackTrace",
+    "test": "jest --passWithNoTests --silent --noStackTrace --runInBand",
     "test:complete": "jest --passWithNoTests",
-    "test:unit": "npm test -- --watch"
+    "test:unit": "npm test -- --watch",
+    "test:integration": "npm test -- --watch -c jest-integration-config.js"
   },
   "keywords": [],
   "author": "",
